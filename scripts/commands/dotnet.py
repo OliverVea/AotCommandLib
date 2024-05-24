@@ -27,6 +27,8 @@ def pack(project: pathlib.Path,
         args += ['--version-suffix', version_suffix]
     args += ['--output', str(out)]
 
+    print(args)
+
     return _run(args)
 
 def nuget_add_source(username: str, token: str):
@@ -39,6 +41,8 @@ def nuget_add_source(username: str, token: str):
             '--name', SOURCE_NAME,
             f'https://nuget.pkg.github.com/{NAMESPACE}/index.json']
     
+    print(args)
+    
     return _run(args, allow_failed = True)
 
 def nuget_push(package_file: pathlib.Path, token: str):
@@ -47,5 +51,7 @@ def nuget_push(package_file: pathlib.Path, token: str):
     args = ['dotnet', 'nuget', 'push', str(package_file),
             '--api-key', token,
             '--source', SOURCE_NAME]
+    
+    print(args)
     
     return _run(args)
