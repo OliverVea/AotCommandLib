@@ -51,7 +51,7 @@ if not nuget_paths:
         shutil.rmtree(BUILD_ROOT)
         exit(1)
 
-    nugget_path = next(nuget_paths)
+    nuget_path = next(nuget_paths)
     print(f'Pushing {nuget_path.name}')
 
 result = nuget_push(nuget_path, args.token)
