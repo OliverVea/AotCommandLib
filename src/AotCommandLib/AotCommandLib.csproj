@@ -9,7 +9,7 @@
     </PropertyGroup>
     
     <PropertyGroup Label="Nuget">   
-        <VersionPrefix>1.0.0</VersionPrefix>
+        <VersionPrefix>0.1.0</VersionPrefix>
         <Authors>Oliver Vea</Authors>
         <PackageDescription>This is a package for adding aot-supported CLI commands.</PackageDescription>
         <RepositoryUrl>https://github.com/OliverVea/AotCommandLib</RepositoryUrl>
