@@ -1,66 +1,63 @@
 """Deploys the project as a nuget package to the Microsoft Nuget registry"""
 
-def main():
-    import argparse
-    import datetime
-    import shutil
+import argparse
+import datetime
+import shutil
 
-    from constants import BUILD_ROOT, PROJECT
-    from commands.dotnet import pack, nuget_add_source, nuget_push
+from constants import BUILD_ROOT, PROJECT
+from commands.dotnet import pack, nuget_add_source, nuget_push
 
-    parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 
-    parser.add_argument('--prerelease', action='store_true')
-    parser.add_argument('--username', help='Github username', required=True, type=str)
-    parser.add_argument('--token', help='Github access token', required=True, type=str)
-    parser.add_argument('--cleanup', help='Removes build folder after deployment', action='store_true')
+parser.add_argument('--prerelease', action='store_true')
+parser.add_argument('--username', help='Github username', required=True, type=str)
+parser.add_argument('--token', help='Github access token', required=True, type=str)
+parser.add_argument('--cleanup', help='Removes build folder after deployment', action='store_true')
 
-    args = parser.parse_args()
+args = parser.parse_args()
 
-    config = 'Debug' if args.prerelease else 'Release'
-    out = BUILD_ROOT / PROJECT.name / config.lower()
-    version_suffix = f'p-{datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}' if args.prerelease else None
-
-    if result := pack(
-        project = PROJECT.csproj_path,
-        out = out,
-        configuration = config,
-        include_symbols = args.prerelease,
-        include_source = args.prerelease,
-        version_suffix = version_suffix
-    ):
-        shutil.rmtree(BUILD_ROOT)
-        exit(result)
+config = 'Debug' if args.prerelease else 'Release'
+out = BUILD_ROOT / PROJECT.name / config.lower()
+version_suffix = f'p-{datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}' if args.prerelease else None
 
 
-    if result := nuget_add_source(args.username, args.token):
-        shutil.rmtree(BUILD_ROOT)
-        exit(result)
-    
-    nuget_paths = out.glob('*.symbols.nupkg')
-
-    if nuget_paths:
-        print('Symbols package found')
-        nuget_path = next(nuget_paths)
-        print(f'Pushing {nuget_path.name}')
-
-    if not nuget_paths:
-        print('No symbols package found')
-        nuget_paths = out.glob('*.nupkg')
-        if not nuget_paths:
-            print('No package found!')
-            shutil.rmtree(BUILD_ROOT)
-            exit(1)
-
-        nuget_path = next(nuget_paths)
-        print(f'Pushing {nuget_path.name}')
-
-    result = nuget_push(nuget_path, args.token)
-
-    if args.cleanup:
-        shutil.rmtree(BUILD_ROOT)
-
+if result := pack(
+    project = PROJECT.csproj_path,
+    out = out,
+    configuration = config,
+    include_symbols = args.prerelease,
+    include_source = args.prerelease,
+    version_suffix = version_suffix
+):
+    shutil.rmtree(BUILD_ROOT)
     exit(result)
 
-if __name__ == '__main__':
-    main()
+
+if result := nuget_add_source(args.username, args.token):
+    shutil.rmtree(BUILD_ROOT)
+    exit(result)
+
+nuget_paths = out.glob('*.symbols.nupkg')
+
+if nuget_paths:
+    print('Symbols package found')
+    nuget_path = next(nuget_paths)
+    print(f'Pushing {nuget_path.name}')
+
+if not nuget_paths:
+    print('No symbols package found')
+    nuget_paths = out.glob('*.nupkg')
+    if not nuget_paths:
+        print('No package found!')
+        shutil.rmtree(BUILD_ROOT)
+        exit(1)
+
+    nuget_path = next(nuget_paths)
+    print(f'Pushing {nuget_path.name}')
+
+result = nuget_push(nuget_path, args.token)
+
+if args.cleanup:
+    shutil.rmtree(BUILD_ROOT)
+
+exit(result)
