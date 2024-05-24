@@ -36,7 +36,7 @@ if result := nuget_add_source(args.username, args.token):
     shutil.rmtree(BUILD_ROOT)
     exit(result)
 
-nuget_path = out / '*.nupkg'
+nuget_path = out / '*.symbols.nupkg'
 
 result = nuget_push(nuget_path, args.token)
 
