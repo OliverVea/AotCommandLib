@@ -43,7 +43,7 @@ def nuget_add_source(username: str, token: str):
     
     print(args)
     
-    return _run(args, allow_failed = True)
+    return _run(args)
 
 def nuget_push(package_file: pathlib.Path, token: str):
     """`dotnet nuget push`: """
