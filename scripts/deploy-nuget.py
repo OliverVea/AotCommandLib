@@ -36,6 +36,8 @@ if result := nuget_add_source(args.username, args.token):
     shutil.rmtree(BUILD_ROOT)
     exit(result)
 
+exit()
+
 nuget_paths = out.glob('*.symbols.nupkg')
 
 if nuget_paths:
