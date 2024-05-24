@@ -37,23 +37,7 @@ if result := nuget_add_source(args.username, args.token):
     shutil.rmtree(BUILD_ROOT)
     exit(result)
 
-nuget_paths = out.glob('*.symbols.nupkg')
-
-if nuget_paths:
-    print('Symbols package found')
-    nuget_path = next(nuget_paths)
-    print(f'Pushing {nuget_path.name}')
-
-if not nuget_paths:
-    print('No symbols package found')
-    nuget_paths = out.glob('*.nupkg')
-    if not nuget_paths:
-        print('No package found!')
-        shutil.rmtree(BUILD_ROOT)
-        exit(1)
-
-    nuget_path = next(nuget_paths)
-    print(f'Pushing {nuget_path.name}')
+nuget_path = out / '*.nupkg'
 
 result = nuget_push(nuget_path, args.token)
 
