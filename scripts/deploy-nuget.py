@@ -1,13 +1,13 @@
 """Deploys the project as a nuget package to the Microsoft Nuget registry"""
 
-import argparse
-import datetime
-import shutil
-
-from constants import BUILD_ROOT, PROJECT
-from commands.dotnet import pack, nuget_add_source, nuget_push
-
 def main():
+    import argparse
+    import datetime
+    import shutil
+
+    from constants import BUILD_ROOT, PROJECT
+    from commands.dotnet import pack, nuget_add_source, nuget_push
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--prerelease', action='store_true')

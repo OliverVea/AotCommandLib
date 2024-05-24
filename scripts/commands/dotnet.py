@@ -16,16 +16,18 @@ def pack(project: pathlib.Path,
         version_suffix: str | None = None):
     """`dotnet pack`: https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-pack"""
 
-    args = ['dotnet', 'pack']
-    args += [str(project)]
-    args += ['--configuration', configuration]
+    args = ['dotnet', 'pack', str(project),
+            '--configuration', configuration,
+            '--output', str(out)]
+    
     if include_source:
-        args += ['--include-source']
+        args.append('--include-source')
+
     if include_symbols:
-        args += ['--include-symbols']
+        args.append('--include-symbols')
+
     if version_suffix is not None:
         args += ['--version-suffix', version_suffix]
-    args += ['--output', str(out)]
 
     print(args)
 
