@@ -3,16 +3,9 @@ import subprocess
 
 from constants import SOURCE_NAME, NAMESPACE
 
-def _run(args, allow_failed: bool = False):
+def _run(args):
     process = subprocess.Popen(args)
-
-    result = process.wait()
-
-    if allow_failed:
-        return 0
-
-    if result != 0:
-        exit(result)
+    return process.wait()
 
 
 def pack(project: pathlib.Path,
