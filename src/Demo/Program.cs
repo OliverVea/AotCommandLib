@@ -9,6 +9,7 @@ serviceCollection.AddCommands(o =>
 });
 
 serviceCollection.AddSingleton<Command, EchoCommand>();
+serviceCollection.AddSingleton<Command, TestCommand>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
