@@ -25,6 +25,13 @@ public class TestCommand : Command
         ShortName = "j",
         Description = "A JSON argument.",
     };
+    
+    private readonly PathArgument _pathArgument = new()
+    {
+        Name = "path",
+        ShortName = "p",
+        Description = "A path argument.",
+    };
 
     private readonly StrictIdArgument<TestCommand> _strictIdArgument = new()
     {
@@ -53,6 +60,7 @@ public class TestCommand : Command
         _floatArgument,
         _intArgument,
         _jsonArgument,
+        _pathArgument,
         _strictIdArgument,
         _stringArgument,
         _uriArgument,
@@ -63,6 +71,7 @@ public class TestCommand : Command
         Console.WriteLine($"Float: {_floatArgument.Value}");
         Console.WriteLine($"Int: {_intArgument.Value}");
         Console.WriteLine($"Json: {_jsonArgument.Value}");
+        Console.WriteLine($"Path: {_pathArgument.Value}");
         Console.WriteLine($"Strict ID: {_strictIdArgument.Value}");
         Console.WriteLine($"String: {_stringArgument.Value}");
         Console.WriteLine($"Uri: {_uriArgument.Value}");
