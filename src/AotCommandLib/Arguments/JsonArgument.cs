@@ -9,18 +9,18 @@ namespace AotCommandLib.Arguments;
 public class JsonArgument<T> : ValueArgument<T>
 {
     /// <inheritdoc />
-    protected override OneOf<T, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<T, Error<string>> TryParseValue(string value)
     {
         try
         {
             var obj = JsonSerializer.Deserialize<T>(value);
-            if (obj == null) return new ErrorMessage($"Invalid JSON: {value}");
+            if (obj == null) return new Error<string>($"Invalid JSON: {value}");
             
             return obj;
         }
         catch (JsonException ex)
         {
-            return new ErrorMessage($"Invalid JSON: {ex.Message}");
+            return new Error<string>($"Invalid JSON: {ex.Message}");
         }
     }
 }

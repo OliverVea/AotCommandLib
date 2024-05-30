@@ -6,13 +6,13 @@
 public class IntArgument : ValueArgument<int>
 {
     /// <inheritdoc />
-    protected override OneOf<int, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<int, Error<string>> TryParseValue(string value)
     {
         if (int.TryParse(value, out var intValue))
         {
             return intValue;
         }
 
-        return new ErrorMessage($"Invalid integer: {value}");
+        return new Error<string>($"Invalid integer: {value}");
     }
 }

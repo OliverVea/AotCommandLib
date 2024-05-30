@@ -35,5 +35,5 @@ public abstract class Command
     /// <summary>
     /// Executes the command.
     /// </summary>
-    public abstract Task<int> ExecuteAsync();
+    public abstract Task<int> ExecuteAsync(CancellationToken cancellationToken = default);
 }

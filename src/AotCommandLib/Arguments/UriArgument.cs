@@ -6,13 +6,13 @@
 public class UriArgument : ValueArgument<Uri>
 {
     /// <inheritdoc />
-    protected override OneOf<Uri, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<Uri, Error<string>> TryParseValue(string value)
     {
         if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
         {
             return uri;
         }
 
-        return new ErrorMessage($"Invalid Uri: {value}");
+        return new Error<string>($"Invalid Uri: {value}");
     }
 }

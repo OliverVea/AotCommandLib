@@ -11,23 +11,26 @@ public abstract class ValueArgument<T> : Argument
     /// </summary>
     /// <remarks>Is set automatically  </remarks>
     public T Value { get; private set; } = default!;
-    private T? DefaultValue { get; init; }
+    
+    /// <summary>
+    /// The default value of the argument.
+    /// </summary>
+    public T DefaultValue { get; init; } = default!;
 
-    internal override OneOf<Success, ErrorMessage> TryParseInternal(string? value)
+    internal override OneOf<Success, Error<string>> TryParseInternal(string? value)
     {
         if (value is null)
         {
-            if (IsRequired) return new ErrorMessage("The argument is required.");
-            if (DefaultValue is null) return new ErrorMessage("The argument is required.");
+            if (IsRequired) return new Error<string>("The argument is required.");
 
-            Value = DefaultValue;
+            Value = PostParse(DefaultValue);
             return new Success();
         }
 
         var result = TryParseValue(value);
         if (result.TryPickT1(out var errorMessage, out var parsedValue)) return errorMessage;
         
-        Value = parsedValue;
+        Value = PostParse(parsedValue);
         return new Success();
     }
     
@@ -36,5 +39,12 @@ public abstract class ValueArgument<T> : Argument
     /// </summary>
     /// <param name="value">The value to parse.</param>
     /// <returns>The parsed value or an error message.</returns>
-    protected abstract OneOf<T, ErrorMessage> TryParseValue(string value);
+    protected abstract OneOf<T, Error<string>> TryParseValue(string value);
+    
+    /// <summary>
+    /// Post-parses the value of the argument.
+    /// </summary>
+    /// <param name="value">The value to post-parse.</param>
+    /// <returns>The post-parsed value.</returns>
+    protected virtual T PostParse(T value) => value;
 }

@@ -35,9 +35,9 @@ public abstract class Argument
     
     internal bool IsSet { get; private set; }
 
-    internal OneOf<Success, ErrorMessage> TryParse(string? value)
+    internal OneOf<Success, Error<string>> TryParse(string? value)
     {
-        if (IsSet) return new ErrorMessage("The argument is already set.");
+        if (IsSet) return new Error<string>("The argument is already set.");
         
         var result = TryParseInternal(value);
         if (result.TryPickT1(out var errorMessage, out _)) return errorMessage;
@@ -46,5 +46,5 @@ public abstract class Argument
         return new Success();
     }
     
-    internal abstract OneOf<Success, ErrorMessage> TryParseInternal(string? value);
+    internal abstract OneOf<Success, Error<string>> TryParseInternal(string? value);
 }

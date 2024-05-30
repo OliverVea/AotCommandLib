@@ -53,7 +53,7 @@ public sealed class CommandRunner
         return result.Match(success => command.ExecuteAsync(),
             error =>
             {
-                Console.WriteLine(error.Message);
+                Console.WriteLine(error.Value);
                 return Task.FromResult(_options.FailureExitCode);
             });
     }

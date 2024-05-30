@@ -6,11 +6,11 @@
 public class PathArgument : ValueArgument<string>
 {
     /// <inheritdoc />
-    protected override OneOf<string, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<string, Error<string>> TryParseValue(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new ErrorMessage("Path cannot be empty.");
+            return new Error<string>("Path cannot be empty.");
         }
         
         try
@@ -22,11 +22,17 @@ public class PathArgument : ValueArgument<string>
                 return fullPath;
             }
 
-            return new ErrorMessage("Path is not fully qualified.");
+            return new Error<string>("Path is not fully qualified.");
         }
         catch (Exception ex)
         {
-            return new ErrorMessage($"Invalid path: {ex.Message}");
+            return new Error<string>($"Invalid path: {ex.Message}");
         }
+    }
+    
+    /// <inheritdoc />
+    protected override string PostParse(string value)
+    {
+        return Path.GetFullPath(value);
     }
 }

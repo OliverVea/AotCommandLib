@@ -1,5 +1,4 @@
 ﻿using AotCommandLib.Arguments;
-using AotCommandLib.Helpers;
 
 namespace AotCommandLib.Commands;
 
@@ -27,7 +26,7 @@ internal class HelpCommand : Command
 
     public override IReadOnlyCollection<Argument> Arguments => [ _verbArgument ];
 
-    public override Task<int> ExecuteAsync()
+    public override Task<int> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var result = _helpHelper.PrintHelp(_verbArgument.Value);
         

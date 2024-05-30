@@ -5,7 +5,7 @@ namespace AotCommandLib;
 
 internal sealed class ArgumentParser
 {
-    internal OneOf<Success, ErrorMessage> AssignArguments(string[] args, Command command)
+    internal OneOf<Success, Error<string>> AssignArguments(string[] args, Command command)
     {
         var nameLookup = command.Arguments.ToDictionary(a => a.Name, a => a);
         var shortNameLookup = command.Arguments.Where(a => a.ShortName != null).ToDictionary(a => a.ShortName!, a => a);
@@ -33,29 +33,42 @@ internal sealed class ArgumentParser
         var requiredArguments = command.Arguments.Where(a => a is { IsRequired: true, IsSet: false }).ToList();
         if (requiredArguments.Any())
         {
-            var missingArguments = string.Join(", ", requiredArguments.Select(a => a.Name));
-            return new ErrorMessage($"Missing required arguments: {missingArguments}.");
+            var missingArguments = string.Join(", ", requiredArguments.Select(GetRequiredArgumentString));
+            return new Error<string>($"Missing required arguments: {missingArguments}.");
+        }
+        
+        var missingValues = command.Arguments.Where(a => a is { IsSet: false }).ToList();
+        foreach (var missingValue in missingValues)
+        {
+            var parseResult = missingValue.TryParse(null);
+            if (parseResult.TryPickT1(out var errorMessage, out _)) return errorMessage;
         }
         
         return new Success();
     }
 
-    private OneOf<Argument, ErrorMessage> GetArgument(string s, Dictionary<string, Argument> nameLookup, Dictionary<string, Argument> shortNameLookup)
+    private string GetRequiredArgumentString(Argument argument)
+    {
+        if (argument.ShortName is not null) return $"[-{argument.ShortName} | --{argument.Name}]";
+        return $"--{argument.Name}";
+    }
+
+    private OneOf<Argument, Error<string>> GetArgument(string s, Dictionary<string, Argument> nameLookup, Dictionary<string, Argument> shortNameLookup)
     {
         if (s.StartsWith("--"))
         {
             var name = s[2..];
             if (nameLookup.TryGetValue(name, out var argument)) return argument;
-            return new ErrorMessage($"Unknown argument '{name}'.");
+            return new Error<string>($"Unknown argument '{name}'.");
         }
 
         if (s.StartsWith("-"))
         {
             var shortName = s[1..];
             if (shortNameLookup.TryGetValue(shortName, out var argument)) return argument;
-            return new ErrorMessage($"Unknown argument '{shortName}'.");
+            return new Error<string>($"Unknown argument '{shortName}'.");
         }
 
-        return new ErrorMessage($"Arguments must start with '-' or '--'. Got '{s}'.");
+        return new Error<string>($"Arguments must start with '-' or '--'. Got '{s}'.");
     }
 }

@@ -9,13 +9,13 @@ namespace AotCommandLib.Arguments;
 public class StrictIdArgument<T> : ValueArgument<Id<T>>
 {
     /// <inheritdoc />
-    protected override OneOf<Id<T>, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<Id<T>, Error<string>> TryParseValue(string value)
     {
         if (Id<T>.TryParse(value, out var id))
         {
             return id;
         }
 
-        return new ErrorMessage($"Invalid Id: {value}");
+        return new Error<string>($"Invalid Id: {value}");
     }
 }

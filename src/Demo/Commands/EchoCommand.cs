@@ -14,8 +14,7 @@ public class EchoCommand(CommandRunnerOptions options) : Command
     };
 
     public override IReadOnlyCollection<Argument> Arguments => [_textArgument];
-    
-    public override Task<int> ExecuteAsync()
+    public override Task<int> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         Console.WriteLine(_textArgument.Value);
         return Task.FromResult(options.SuccessExitCode);

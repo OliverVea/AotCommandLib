@@ -8,7 +8,7 @@ public sealed class StringArgument : ValueArgument<string>
     /// <summary>
     /// Parses the value of the argument.
     /// </summary>
-    protected override OneOf<string, ErrorMessage> TryParseValue(string value)
+    protected override OneOf<string, Error<string>> TryParseValue(string value)
     {
         return value;
     }

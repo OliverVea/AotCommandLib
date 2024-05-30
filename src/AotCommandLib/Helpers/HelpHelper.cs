@@ -3,11 +3,11 @@ using AotCommandLib.Arguments;
 using AotCommandLib.Commands;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AotCommandLib.Helpers;
+namespace AotCommandLib;
 
 internal class HelpHelper(IServiceProvider services)
 {
-    internal OneOf<Success, ErrorMessage> PrintHelp(string? verb)
+    internal OneOf<Success, Error<string>> PrintHelp(string? verb)
     {
         var commands = services.GetServices<Command>();
 
@@ -18,7 +18,7 @@ internal class HelpHelper(IServiceProvider services)
         }
         
         var command = commands.FirstOrDefault(c => c.Verb == verb);
-        if (command == null) return new ErrorMessage($"Command '{verb}' not found.");
+        if (command == null) return new Error<string>($"Command '{verb}' not found.");
         
         PrintCommand(command);
         return new Success();

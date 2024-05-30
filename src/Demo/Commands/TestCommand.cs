@@ -66,7 +66,7 @@ public class TestCommand : Command
         _uriArgument,
     ];
 
-    public override Task<int> ExecuteAsync()
+    public override Task<int> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         Console.WriteLine($"Float: {_floatArgument.Value}");
         Console.WriteLine($"Int: {_intArgument.Value}");
