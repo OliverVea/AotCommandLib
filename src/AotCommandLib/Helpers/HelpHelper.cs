@@ -9,44 +9,43 @@ internal class HelpHelper(IServiceProvider services)
 {
     internal OneOf<Success, Error<string>> PrintHelp(string? verb)
     {
-        var commands = services.GetServices<Command>();
+        var commandOptions = services.GetServices<CommandOptions>();
 
         if (verb == null)
         {
-            PrintAllCommands(commands);
+            PrintAllCommands(commandOptions);
             return new Success();
         }
         
-        var command = commands.FirstOrDefault(c => c.Verb == verb);
+        var command = commandOptions.FirstOrDefault(c => c.Verb == verb);
         if (command == null) return new Error<string>($"Command '{verb}' not found.");
         
         PrintCommand(command);
         return new Success();
     }
 
-    private static void PrintAllCommands(IEnumerable<Command> commands)
+    private static void PrintAllCommands(IEnumerable<CommandOptions> commandOptions)
     {
-        Console.WriteLine("Available commands:");
+        Console.WriteLine("Available Commands:");
 
-        foreach (var c in commands)
+        foreach (var c in commandOptions)
         {
-            Console.WriteLine();
             PrintCommand(c, c.PrintArgumentsInList);
         }
     }
     
-    private static void PrintCommand(Command command, bool printArguments = true)
+    private static void PrintCommand(CommandOptions commandOptions, bool printArguments = true)
     {
         var sb = new StringBuilder();
         
-        sb.Append(command.Verb);
-        sb.Append($": {command.Description}");
+        sb.Append(commandOptions.Verb);
+        sb.Append($": {commandOptions.Description}");
         
         Console.WriteLine(sb.ToString());
         
         if (!printArguments) return;
         
-        foreach (var arg in command.Arguments) PrintArgument(arg);
+        foreach (var arg in commandOptions.Arguments) PrintArgument(arg);
     }
     
     private static void PrintArgument(Argument arg)

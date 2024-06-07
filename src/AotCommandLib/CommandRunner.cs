@@ -1,60 +1,54 @@
 ﻿using AotCommandLib.Commands;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AotCommandLib;
 
-/// <summary>
-/// The command runner. This is the main entry point for running commands.
-/// </summary>
-public sealed class CommandRunner
+internal sealed class CommandRunner(
+    IEnumerable<CommandOptions> commandOptions,
+    ArgumentParser argumentParser,
+    CommandRunnerOptions options,
+    IServiceProvider serviceProvider) : ICommandRunner
 {
-    private readonly IEnumerable<Command> _commands;
-    private readonly ArgumentParser _argumentParser;
-    private readonly CommandRunnerOptions _options;
-    
-    internal CommandRunner(IEnumerable<Command> commands, ArgumentParser argumentParser, CommandRunnerOptions options)
-    {
-        _commands = commands;
-        _argumentParser = argumentParser;
-        _options = options;
-    }
-    
-    /// <summary>
-    /// Runs the command runner with the specified arguments.
-    /// </summary>
-    /// <param name="args">The arguments to run the command runner with.</param>
-    /// <returns>The exit code of the command runner.</returns>
     public Task<int> RunAsync(string[] args)
     {
         if (args.Length == 0) 
         {
-            if (_options.FallbackCommand is null)
+            if (options.FallbackCommand is null)
             {
                 Console.WriteLine("No command provided.");
-                return Task.FromResult(_options.FailureExitCode);
+                return Task.FromResult(options.FailureExitCode);
             }
 
-            args = [_options.FallbackCommand];
+            args = [options.FallbackCommand];
         }
 
         var verb = args[0];
 
-        var command = _commands.FirstOrDefault(c => c.Verb == verb);
+        var commandOption = commandOptions.FirstOrDefault(c => c.Verb == verb);
         
-        if (command is null)
+        if (commandOption is null)
         {
             Console.WriteLine($"Command '{verb}' not found. Use 'help' to see available commands.");
-            return Task.FromResult(_options.FailureExitCode);
+            return Task.FromResult(options.FailureExitCode);
         }
 
         var commandArgs = args.Skip(1).ToArray();
         
-        var result = _argumentParser.AssignArguments(commandArgs, command);
+        var result = argumentParser.AssignArguments(commandArgs, commandOption);
         
-        return result.Match(success => command.ExecuteAsync(),
+        return result.Match(
+            _ => ExecuteCommand(commandOption),
             error =>
             {
                 Console.WriteLine(error.Value);
-                return Task.FromResult(_options.FailureExitCode);
+                return Task.FromResult(options.FailureExitCode);
             });
+    }
+
+    private Task<int> ExecuteCommand(CommandOptions commandOptions)
+    {
+        var scope = serviceProvider.CreateScope();
+        var command = commandOptions.BuildCommand(scope);
+        return command.ExecuteAsync();
     }
 }

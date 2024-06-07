@@ -5,10 +5,10 @@ namespace AotCommandLib;
 
 internal sealed class ArgumentParser
 {
-    internal OneOf<Success, Error<string>> AssignArguments(string[] args, Command command)
+    internal OneOf<Success, Error<string>> AssignArguments(string[] args, CommandOptions commandOptions)
     {
-        var nameLookup = command.Arguments.ToDictionary(a => a.Name, a => a);
-        var shortNameLookup = command.Arguments.Where(a => a.ShortName != null).ToDictionary(a => a.ShortName!, a => a);
+        var nameLookup = commandOptions.Arguments.ToDictionary(a => a.Name, a => a);
+        var shortNameLookup = commandOptions.Arguments.Where(a => a.ShortName != null).ToDictionary(a => a.ShortName!, a => a);
 
         for (var i = 0; i < args.Length; i++)
         {
@@ -30,14 +30,14 @@ internal sealed class ArgumentParser
             }
         }
         
-        var requiredArguments = command.Arguments.Where(a => a is { IsRequired: true, IsSet: false }).ToList();
+        var requiredArguments = commandOptions.Arguments.Where(a => a is { IsRequired: true, IsSet: false }).ToList();
         if (requiredArguments.Any())
         {
             var missingArguments = string.Join(", ", requiredArguments.Select(GetRequiredArgumentString));
             return new Error<string>($"Missing required arguments: {missingArguments}.");
         }
         
-        var missingValues = command.Arguments.Where(a => a is { IsSet: false }).ToList();
+        var missingValues = commandOptions.Arguments.Where(a => a is { IsSet: false }).ToList();
         foreach (var missingValue in missingValues)
         {
             var parseResult = missingValue.TryParse(null);

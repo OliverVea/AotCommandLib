@@ -8,11 +8,13 @@ serviceCollection.AddCommands(o =>
     o.FallbackCommand = "help";
 });
 
-serviceCollection.AddSingleton<Command, EchoCommand>();
-serviceCollection.AddSingleton<Command, TestCommand>();
+serviceCollection.AddScoped<EchoCommand>();
+serviceCollection.AddSingleton<CommandOptions, EchoCommandOptions>();
+serviceCollection.AddScoped<TestCommand>();
+serviceCollection.AddSingleton<CommandOptions, TestCommandOptions>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var commandRunner = serviceProvider.GetRequiredService<CommandRunner>();
+var commandRunner = serviceProvider.GetRequiredService<ICommandRunner>();
 
 return await commandRunner.RunAsync(args);
